@@ -7,6 +7,18 @@ from models.company_info import Company
 
 app = FastAPI()
 
+@app.get("/stocks/chart/{symbol}/{period}")
+async def get_chart(symbol: str, period: str = "1mo"):
+    ticker = yf.Ticker(symbol)
+    hist = ticker.history(period=period)
+    hist.reset_index(inplace=True)
+
+    data = [
+        {"x": i, "open": float(row["Open"]), "close": float(row["Close"])}
+        for i, row in hist.iterrows()
+    ]
+    return {"data": data}
+
 @app.get("/stocks/{symbols}", response_model=Company)
 async def stocktitleinfo(symbols: str):
     dat = yf.Ticker(symbols)
