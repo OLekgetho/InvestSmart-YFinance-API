@@ -1,0 +1,44 @@
+{
+  "items": [
+    {
+      "id": "601f08c2-1cf0-4635-8d4c-aaddd610557d",
+      "type": "STORY",
+      "title": "Apple spent 2025 setting itself up for the future — and its biggest moves weren't about AI",
+      "summary": "Apple's 2025 helped set up its future.",
+      "publishedAt": "2025-12-23T21:15:25Z",
+      "displayTime": "2025-12-24T19:04:40Z",
+      "source": "Yahoo Finance",
+      "url": "https://finance.yahoo.com/news/apple-spent-2025-setting-itself-up-for-the-future--and-its-biggest-moves-werent-about-ai-211525196.html",
+      "image": {
+        "url": "https://s.yimg.com/os/creatr-uploaded-images/2025-01/4aae2830-dda3-11ef-9f5f-9631a8d45eb7",
+        "width": 4038,
+        "height": 2692
+      },
+      "editorsPick": true
+    },
+    {
+      "id": "12fc4a8f-32b7-3b88-9ff7-6459ddd7bcc5",
+      "type": "VIDEO",
+      "title": "Tesla faces probe, Intel slides on Nvidia reports, bitcoin falls",
+      "summary": "Market Domination host Josh Lipton examines some of Wednesday's top trending tickers.",
+      "publishedAt": "2025-12-24T17:29:42Z",
+      "source": "Yahoo Finance Video",
+      "url": "https://finance.yahoo.com/video/tesla-faces-probe-intel-slides-172942248.html",
+      "image": {
+        "url": "https://s.yimg.com/os/creatr-uploaded-images/2025-12/8958bb10-e0ed-11f0-b54f-9eb75813060e",
+        "width": 5471,
+        "height": 3073
+      }
+    },
+    {
+      "id": "945dbdaa-3445-43cb-984f-5c3f220b361b",
+      "type": "STORY",
+      "title": "Vanguard flips the script on 60/40 investment strategy",
+      "summary": "Vanguard thinks the 60/40 portfolio should be flipped. Retirement experts weigh in.",
+      "publishedAt": "2025-12-24T11:00:26Z",
+      "source": "Yahoo Finance",
+      "url": "https://finance.yahoo.com/news/vanguard-flips-the-script-on-6040-investment-strategy-110026190.html",
+      "image": null
+    }
+  ]
+}
