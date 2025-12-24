@@ -1,12 +1,18 @@
+from typing import List
+
 import pandas as pd
 import yfinance as yf
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
 from models.company_info import Company
+from models.company_news import CompanyNews
+from models.news import News
 
 app = FastAPI()
 
+
+# Charts RestAPI
 @app.get("/stocks/chart/{symbol}/{period}")
 async def get_chart(symbol: str, period: str = "1mo"):
     ticker = yf.Ticker(symbol)
@@ -19,6 +25,8 @@ async def get_chart(symbol: str, period: str = "1mo"):
     ]
     return {"data": data}
 
+
+# StockPrice Title
 @app.get("/stocks/{symbols}", response_model=Company)
 async def stocktitleinfo(symbols: str):
     dat = yf.Ticker(symbols)
@@ -49,3 +57,18 @@ async def stocktitleinfo(symbols: str):
         fiveYrPercentage= five_year_return,
         fiveYrDiff=five_year_diff
     )
+
+# News
+@app.get("/stock/articles/{symbol}")
+async def get_articles(symbol: str):
+    dat = yf.Ticker(symbol)
+    news_headlines = dat.news
+
+    top_articles = news_headlines[:2]
+
+    news_items = []
+    for article in top_articles:
+        news_items.append(article)
+
+
+    return news_items
