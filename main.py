@@ -64,7 +64,7 @@ async def get_articles(symbol: str):
     dat = yf.Ticker(symbol)
     news_headlines = dat.news
 
-    top_articles = news_headlines[:2]
+    top_articles = news_headlines[:5]
 
     news_items = []
     for article in top_articles:
