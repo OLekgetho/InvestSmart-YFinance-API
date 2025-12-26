@@ -20,7 +20,12 @@ async def get_chart(symbol: str, period: str = "1mo"):
     hist.reset_index(inplace=True)
 
     data = [
-        {"x": i, "open": float(row["Open"]), "close": float(row["Close"])}
+        {"date": row["Date"],
+         "open": float(row["Open"]),
+         "close": float(row["Close"]),
+         "low": float(row["Low"]),
+         "high": float(row["High"]),
+         }
         for i, row in hist.iterrows()
     ]
     return {"data": data}
