@@ -12,6 +12,42 @@ from models.stockProfile import StockProfile
 
 app = FastAPI()
 
+# Show all rows and columns
+pd.set_option("display.max_rows", None)
+pd.set_option("display.max_columns", None)
+pd.set_option("display.width", None)
+
+# Remove scientific notation
+pd.options.display.float_format = "{:,.0f}".format
+
+# Income Statement
+@app.get("/stocks/profile/incomestatment/{symbol}")
+async def get_incomestatement(symbol: str):
+    dat = yf.Ticker(symbol)
+    df = dat.income_stmt
+    annual = df / 1_000
+    annual = annual.fillna("---")
+    return annual
+
+
+# Balance Sheet
+@app.get("/stocks/profile/cashflowstatment/{symbol}")
+async def get_cashflowstatement(symbol: str):
+    dat = yf.Ticker(symbol)
+    df = dat.cash_flow
+    annual = df / 1_000
+    annual = annual.fillna("---")
+    return annual
+
+# Balance Sheet
+@app.get("/stocks/profile/balancesheet/{symbol}")
+async def get_balancesheet(symbol: str):
+    dat = yf.Ticker(symbol)
+    df = dat.balance_sheet
+    annual = df / 1_000
+    annual = annual.fillna("---")
+    return annual
+
 #StockProfile
 @app.get("/stocks/profile/{symbol}", response_model=StockProfile)
 async def get_profile(symbol: str):
