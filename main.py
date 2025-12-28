@@ -8,9 +8,16 @@ from pydantic import BaseModel
 from models.company_info import Company
 from models.company_news import CompanyNews
 from models.news import News
+from models.stockProfile import StockProfile
 
 app = FastAPI()
 
+#StockProfile
+@app.get("/stocks/profile/{symbol}", response_model=StockProfile)
+async def get_profile(symbol: str):
+    symbol = yf.Ticker(symbol)
+    profile = symbol.info
+    return StockProfile(**profile)
 
 # Charts RestAPI
 @app.get("/stocks/chart/{symbol}/{period}")
