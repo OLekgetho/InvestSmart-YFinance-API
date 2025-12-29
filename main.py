@@ -52,7 +52,7 @@ async def get_balancesheet(symbol: str):
 @app.get("/stocks/profile/{symbol}", response_model=StockProfile)
 async def get_profile(symbol: str):
     symbol = yf.Ticker(symbol)
-    profile = symbol.infoz
+    profile = symbol.info
     return StockProfile(**profile)
 
 # Charts RestAPI
