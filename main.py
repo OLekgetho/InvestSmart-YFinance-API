@@ -52,7 +52,7 @@ async def get_balancesheet(symbol: str):
 @app.get("/stocks/profile/{symbol}", response_model=StockProfile)
 async def get_profile(symbol: str):
     symbol = yf.Ticker(symbol)
-    profile = symbol.info
+    profile = symbol.infoz
     return StockProfile(**profile)
 
 # Charts RestAPI
@@ -93,6 +93,17 @@ async def stocktitleinfo(symbols: str):
     five_year_return = (latest_price / five_year_price - 1) * 100
     five_year_date_str = five_year_date.strftime("%Y-%m-%d")
     five_year_diff = latest_price - five_year_price;
+
+    oneonthdffive = dat.history(period="1mo")
+
+    one_Month_year = oneonthdffive.iloc[0]
+    one_Month_year_price = one_Month_year["Close"]
+    one_Month_year_date = one_Month_year.name
+
+    one_month_return = (latest_price / one_Month_year_price - 1) * 100
+    one_month_diff = latest_price - one_Month_year_price;
+    one_month_date_str = one_Month_year_date.strftime("%Y-%m-%d")
+
     return Company(
         symbol = df.get("symbol"),
         displayName= df.get("displayName"),
@@ -103,7 +114,11 @@ async def stocktitleinfo(symbols: str):
         regularMarketPreviousClose=df.get("regularMarketPreviousClose"),
         fiveYrDate=five_year_date_str,
         fiveYrPercentage= five_year_return,
-        fiveYrDiff=five_year_diff
+        fiveYrDiff=five_year_diff,
+        oneMonthDate=one_month_date_str,
+        oneMonthDiff=one_month_diff,
+        oneMonthPercentage=one_month_return,
+        oneMonthPrice=one_Month_year_price
     )
 
 # News
