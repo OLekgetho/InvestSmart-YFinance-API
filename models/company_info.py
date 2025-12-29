@@ -12,4 +12,8 @@ class Company(BaseModel):
     fiveYrDate: Optional[str]
     fiveYrPercentage: Optional[float]
     fiveYrDiff: Optional[float]
+    oneMonthDate: Optional[str]
+    oneMonthPercentage: Optional[float]
+    oneMonthDiff: Optional[float]
+    oneMonthPrice: Optional[float]
 
