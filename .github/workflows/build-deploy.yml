@@ -3,7 +3,7 @@ name: Build and Push Docker
 on:
   push:
     branches:
-      - Dev
+      - dev
       - main
 
 jobs:
@@ -21,7 +21,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build Docker image
-        run: docker build -t ${{ secrets.USER }}/yfinanceApi:${{ github.ref_name }} .
+        run: docker build -t ${{ secrets.USER }}/yfinanceapi:${{ github.ref_name }} .
 
       - name: Push Docker image
-        run: docker push ${{ secrets.USER }}/yfinanceApi:${{ github.ref_name }}
+        run: docker push ${{ secrets.USER }}/yfinanceapi:${{ github.ref_name }}
