@@ -28,3 +28,6 @@ jobs:
 
       - name: Push Docker image
         run: docker push ${{ secrets.DOCKER_USERNAME }}/yfinanceapi:${{ env.BRANCH }}
+
+      - name: Pull Docker image
+        run: docker pull ${{ secrets.DOCKER_USERNAME }}/yfinanceapi:${{ env.BRANCH }}
