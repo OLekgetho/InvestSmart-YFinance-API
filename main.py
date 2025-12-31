@@ -20,6 +20,14 @@ pd.set_option("display.width", None)
 # Remove scientific notation
 pd.options.display.float_format = "{:,.0f}".format
 
+# Analyst Price Targets
+@app.get("/stocks/profile/analyst/{symbol}")
+async def get_analystpricetargets(symbol: str):
+    dat = yf.Ticker(symbol)
+    df = dat.analyst_price_targets
+    return df
+
+
 # Income Statement
 @app.get("/stocks/profile/incomestatment/{symbol}")
 async def get_incomestatement(symbol: str):
@@ -135,3 +143,4 @@ async def get_articles(symbol: str):
 
 
     return news_items
+
