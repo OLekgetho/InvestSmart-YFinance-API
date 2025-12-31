@@ -21,7 +21,7 @@ pd.set_option("display.width", None)
 pd.options.display.float_format = "{:,.0f}".format
 
 # Analyst Price Targets
-@app.get("/stocks/profile/analyst")
+@app.get("/stocks/profile/analyst/{symbol}")
 async def get_analystpricetargets(symbol: str):
     dat = yf.Ticker(symbol)
     df = dat.analyst_price_targets
