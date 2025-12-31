@@ -3,7 +3,6 @@ name: Build and Push Docker
 on:
   push:
     branches:
-      - Dev
       - main
 
 jobs:
@@ -24,10 +23,10 @@ jobs:
         run: echo "BRANCH=$(echo '${{ github.ref_name }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
       - name: Build Docker image
-        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/yfinanceapi:${{ env.BRANCH }} .
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/investsmart:yfinancefastapi-${{ env.BRANCH }} .
 
       - name: Push Docker image
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/yfinanceapi:${{ env.BRANCH }}
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/investsmart:yfinancefastapi-${{ env.BRANCH }}
 
       - name: Pull Docker image
-        run: docker pull ${{ secrets.DOCKER_USERNAME }}/yfinanceapi:${{ env.BRANCH }}
+        run: docker pull ${{ secrets.DOCKER_USERNAME }}/investsmart:yfinancefastapi-${{ env.BRANCH }}
