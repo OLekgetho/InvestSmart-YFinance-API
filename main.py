@@ -5,9 +5,11 @@ import yfinance as yf
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
+from formats.numberFormats import format_number_human, format_percentage, format_ratio
 from models.company_info import Company
 from models.company_news import CompanyNews
 from models.news import News
+from models.personal_kpi import PersonalKpi
 from models.stockProfile import StockProfile
 
 app = FastAPI()
@@ -19,6 +21,70 @@ pd.set_option("display.width", None)
 
 # Remove scientific notation
 pd.options.display.float_format = "{:,.0f}".format
+
+dat = yf.Ticker("AAPL")
+info = dat.info
+
+
+
+
+# Personal Metrics
+@app.get("/stocks/personal/metrics/{symbol}", response_model=PersonalKpi)
+async def get_personalmetrics(symbol: str):
+    dat = yf.Ticker(symbol)
+    info = dat.info
+
+    # Current TTM data
+    incomestat_ttm = dat.ttm_income_stmt
+    revenue = incomestat_ttm.loc["Total Revenue"].iloc[0]
+    net_income_current = incomestat_ttm.loc["Net Income"].iloc[0]
+    marketcap = info.get("marketCap")
+
+    # Historical annual data
+    incomestat_annual = dat.financials
+
+    # Only keep specific years
+    years_to_include = [2024, 2023, 2022, 2021]
+    existing_years = [col for col in incomestat_annual.columns if col.year in years_to_include]
+
+    # Net income for the selected years
+    net_income_selected = incomestat_annual.loc[
+        "Net Income", existing_years] if "Net Income" in incomestat_annual.index else pd.Series(dtype=float)
+
+    # Average of 4-year net income
+    avg_net_income = net_income_selected.mean() if not net_income_selected.empty else net_income_current
+
+    #P/E (TTM)
+    traillingpe = marketcap/net_income_current
+
+    # four year P/E (TTM)
+    fouryeartrailingpe = marketcap/avg_net_income
+
+    # Price to Sale
+    psratio = marketcap/revenue
+
+    # Profit Margin
+    profitM = net_income_current/revenue
+
+    return PersonalKpi(
+        marketCap= format_number_human(marketcap),
+        revenue= format_number_human(revenue),
+        netIncome= format_number_human(net_income_current),
+        fouryearNetIncomeAvg= format_number_human(avg_net_income),
+        trailingpe= format_ratio(traillingpe),
+        fourYearAveragePE= format_ratio(fouryeartrailingpe),
+        pricetosaleratio= format_ratio(psratio),
+        profitMarginTTM= format_percentage(profitM)
+    )
+
+
+# Analyst Price Targets
+@app.get("/stocks/profile/analyst/{symbol}")
+async def get_analystpricetargets(symbol: str):
+    dat = yf.Ticker(symbol)
+    df = dat.analyst_price_targets
+    return df
+
 
 # Income Statement
 @app.get("/stocks/profile/incomestatment/{symbol}")
@@ -135,3 +201,4 @@ async def get_articles(symbol: str):
 
 
     return news_items
+
