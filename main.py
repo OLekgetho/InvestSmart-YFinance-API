@@ -91,7 +91,7 @@ async def get_personalmetrics(symbol: str):
     gross_profit_margin = gross_profit/revenue
 
     # Price to Free Cash Flow TTM
-    pe_free_cash_flow = marketcap/freecashflow
+    pe_free_cash_flow = marketcap / freecashflow
 
     # 4-year Average PE Cash Flow
     fouryearcashflowaverage = marketcap/ avg_freecashflow
@@ -110,7 +110,7 @@ async def get_personalmetrics(symbol: str):
         grossProfitMargin= format_percentage(gross_profit_margin),
         freeCashFlowTTM= format_number_human(freecashflow),
         fouryearFreeCashFlow=format_number_human(avg_freecashflow),
-        pEFreeCashFlow=format_ratio(pe_free_cash_flow),
+        pEFreeCashFlow=format_ratio(pe_free_cash_flow,2),
         fouryearPEFreeCashFlow=format_ratio(fouryearcashflowaverage)
 
     )
