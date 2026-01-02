@@ -23,7 +23,7 @@ pd.set_option("display.width", None)
 pd.options.display.float_format = "{:,.0f}".format
 
 dat = yf.Ticker("AAPL")
-info = dat.info
+print(dat.cash_flow)
 
 
 
@@ -35,24 +35,46 @@ async def get_personalmetrics(symbol: str):
     info = dat.info
 
     # Current TTM data
+
     incomestat_ttm = dat.ttm_income_stmt
+    cashflow_ttm = dat.ttm_cash_flow
     revenue = incomestat_ttm.loc["Total Revenue"].iloc[0]
     net_income_current = incomestat_ttm.loc["Net Income"].iloc[0]
+    gross_profit = incomestat_ttm.loc["Gross Profit"].iloc[0]
     marketcap = info.get("marketCap")
+    freecashflow = cashflow_ttm.loc["Free Cash Flow"].iloc[0]
+
 
     # Historical annual data
     incomestat_annual = dat.financials
+    cashflow_annual = dat.cash_flow
 
     # Only keep specific years
     years_to_include = [2024, 2023, 2022, 2021]
     existing_years = [col for col in incomestat_annual.columns if col.year in years_to_include]
+    existing_years_cashflow = [col for col in cashflow_annual.columns if col.year in years_to_include]
 
     # Net income for the selected years
     net_income_selected = incomestat_annual.loc[
         "Net Income", existing_years] if "Net Income" in incomestat_annual.index else pd.Series(dtype=float)
 
+    # Revenue for the selcted years
+    revenue_selected = incomestat_annual.loc[
+        "Total Revenue", existing_years] if "Total Revenue" in incomestat_annual.index else pd.Series(dtype=float)
+
+    # Free Cashflow for the selected years
+    freecashflow_selected = cashflow_annual.loc[
+        "Free Cash Flow", existing_years_cashflow] if "Free Cash Flow" in cashflow_annual.index else pd.Series(dtype=float)
+
+
     # Average of 4-year net income
     avg_net_income = net_income_selected.mean() if not net_income_selected.empty else net_income_current
+
+    # Average of 4-year revenue
+    avg_revenue = revenue_selected.mean() if not revenue_selected.empty else revenue
+
+    # Average of 4-year free cash flow
+    avg_freecashflow = freecashflow_selected.mean() if not freecashflow_selected.empty else freecashflow
 
     #P/E (TTM)
     traillingpe = marketcap/net_income_current
@@ -66,6 +88,19 @@ async def get_personalmetrics(symbol: str):
     # Profit Margin
     profitM = net_income_current/revenue
 
+    # 4-year Average Profit Margin
+    avg_ProfitM = avg_net_income/avg_revenue
+
+    # Gross Profit Margin
+    gross_profit_margin = gross_profit/revenue
+
+    # Price to Free Cash Flow TTM
+    pe_free_cash_flow = marketcap/freecashflow
+
+    # 4-year Average PE Cash Flow
+    fouryearcashflowaverage = marketcap/ avg_freecashflow
+
+
     return PersonalKpi(
         marketCap= format_number_human(marketcap),
         revenue= format_number_human(revenue),
@@ -74,7 +109,14 @@ async def get_personalmetrics(symbol: str):
         trailingpe= format_ratio(traillingpe),
         fourYearAveragePE= format_ratio(fouryeartrailingpe),
         pricetosaleratio= format_ratio(psratio),
-        profitMarginTTM= format_percentage(profitM)
+        profitMarginTTM= format_percentage(profitM),
+        fouryearProfitMargin= format_percentage(avg_ProfitM),
+        grossProfitMargin= format_percentage(gross_profit_margin),
+        freeCashFlowTTM= format_number_human(freecashflow),
+        fouryearFreeCashFlow=format_number_human(avg_freecashflow),
+        pEFreeCashFlow=format_ratio(pe_free_cash_flow),
+        fouryearPEFreeCashFlow=format_ratio(fouryearcashflowaverage)
+
     )
 
 
