@@ -32,8 +32,9 @@ def format_number_human(value: float) -> str:
 def format_ratio(value: float, decimals: int = 2) -> str:
     """
     Format a numeric ratio or P/E to a string with fixed decimals.
-    Returns 'N/A' if value is None or not finite.
+    Returns 'N/A' if value is None, <= 0, or not finite.
     """
-    if value is None or not pd.notna(value) or value == float('inf') or value == float('-inf'):
+    if value is None or value <= 0 or not pd.notna(value) or value in [float('inf'), float('-inf')]:
         return "N/A"
     return f"{value:.{decimals}f}"
+
