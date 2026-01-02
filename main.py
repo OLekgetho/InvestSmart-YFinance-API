@@ -22,11 +22,6 @@ pd.set_option("display.width", None)
 # Remove scientific notation
 pd.options.display.float_format = "{:,.0f}".format
 
-dat = yf.Ticker("AAPL")
-print(dat.cash_flow)
-
-
-
 
 # Personal Metrics
 @app.get("/stocks/personal/metrics/{symbol}", response_model=PersonalKpi)
@@ -48,6 +43,7 @@ async def get_personalmetrics(symbol: str):
     # Historical annual data
     incomestat_annual = dat.financials
     cashflow_annual = dat.cash_flow
+
 
     # Only keep specific years
     years_to_include = [2024, 2023, 2022, 2021]
