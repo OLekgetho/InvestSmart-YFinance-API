@@ -5,7 +5,7 @@ import yfinance as yf
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
-from formats.numberFormats import format_number_human, format_percentage, format_ratio
+from formats.numberFormats import format_number_human, format_percentage, format_ratio, safe_cagr
 from models.company_info import Company
 from models.company_news import CompanyNews
 from models.news import News
@@ -22,6 +22,35 @@ pd.set_option("display.width", None)
 # Remove scientific notation
 pd.options.display.float_format = "{:,.0f}".format
 
+# Financial AI Summary
+@app.get("/stocks/profile/financials")
+async def get_financials_for_summary(symbol: str):
+    dat = yf.Ticker(symbol)
+    income_stat = dat.income_stmt
+    cashflow_stat = dat.cash_flow
+    balance_sheet = dat.balance_sheet
+
+    revenue = income_stat.loc["Total Revenue"].iloc[0:2]
+    gross_profit = income_stat.loc["Gross Profit"].iloc[0:2]
+    operating_income = income_stat.loc["Operating Income"].iloc[0:2]
+    net_icome = income_stat.loc["Net Income"].iloc[0:2]
+    basic_eps = income_stat.loc["Basic EPS"].iloc[0:2]
+
+    total_assets = balance_sheet.loc["Total Assets"].iloc[0:2]
+    total_liabilities = balance_sheet.loc["Total Liabilities Net Minority Interest"].iloc[0:2]
+    total_equity = balance_sheet.loc["Total Equity Gross Minority Interest"].iloc[0:2]
+    cash_and_cash_equavalent = balance_sheet.loc["Cash And Cash Equivalents"].iloc[0:2]
+    current_assets = balance_sheet.loc["Current Assets"].iloc[0:2]
+    current_liabilities = balance_sheet.loc["Current Liabilities"].iloc[0:2]
+    working_capital = balance_sheet.loc["Working Capital"].iloc[0:2]
+    total_debt = balance_sheet.loc["Total Debt"].iloc[0:2]
+
+    net_income_from_continuing_operations = cashflow_stat.loc["Net Income From Continuing Operations"].iloc[0:2]
+    investing_cash_flow = cashflow_stat.loc["Investing Cash Flow"].iloc[0:2]
+    financing_cash_flow = cashflow_stat.loc["Financing Cash Flow"].iloc[0:2]
+    free_cash_flow = cashflow_stat.loc["Free Cash Flow"].iloc[0:2]
+    changes_in_cash = cashflow_stat.loc["Changes In Cash "].iloc[0:2]
+
 
 # Personal Metrics
 @app.get("/stocks/personal/metrics/{symbol}", response_model=PersonalKpi)
@@ -30,14 +59,15 @@ async def get_personalmetrics(symbol: str):
     info = dat.info
 
     # Current TTM data
-
     incomestat_ttm = dat.ttm_income_stmt
     cashflow_ttm = dat.ttm_cash_flow
+    balancesheet_ttm = dat.balance_sheet.iloc[0]
     revenue = incomestat_ttm.loc["Total Revenue"].iloc[0]
     net_income_current = incomestat_ttm.loc["Net Income"].iloc[0]
     gross_profit = incomestat_ttm.loc["Gross Profit"].iloc[0]
     marketcap = info.get("marketCap")
     freecashflow = cashflow_ttm.loc["Free Cash Flow"].iloc[0]
+
 
 
     # Historical annual data
@@ -75,9 +105,6 @@ async def get_personalmetrics(symbol: str):
     #P/E (TTM)
     traillingpe = marketcap/net_income_current
 
-    # four year P/E (TTM)
-    fouryeartrailingpe = marketcap/avg_net_income
-
     # Price to Sale
     psratio = marketcap/revenue
 
@@ -93,17 +120,26 @@ async def get_personalmetrics(symbol: str):
     # Price to Free Cash Flow TTM
     pe_free_cash_flow = marketcap / freecashflow
 
-    # 4-year Average PE Cash Flow
-    fouryearcashflowaverage = marketcap/ avg_freecashflow
+    # Enterprise Value
+    ev = info.get("enterpriseValue")
 
+    # Cash Flow Conversion
+    fcf_to_net_income = freecashflow / net_income_current if net_income_current else None
 
+    # Net Debt
+    total_debt = info.get("totalDebt")
+    cash = info.get("totalCash")
+    net_debt = total_debt - cash if total_debt and cash else None
+
+    revenue_cagr = safe_cagr(revenue_selected)
+    net_income_cagr = safe_cagr(net_income_selected)
+    fcf_cagr = safe_cagr(freecashflow_selected)
     return PersonalKpi(
         marketCap= format_number_human(marketcap),
         revenue= format_number_human(revenue),
         netIncome= format_number_human(net_income_current),
         fouryearNetIncomeAvg= format_number_human(avg_net_income),
         trailingpe= format_ratio(traillingpe),
-        fourYearAveragePE= format_ratio(fouryeartrailingpe),
         pricetosaleratio= format_ratio(psratio),
         profitMarginTTM= format_percentage(profitM),
         fouryearProfitMargin= format_percentage(avg_ProfitM),
@@ -111,8 +147,12 @@ async def get_personalmetrics(symbol: str):
         freeCashFlowTTM= format_number_human(freecashflow),
         fouryearFreeCashFlow=format_number_human(avg_freecashflow),
         pEFreeCashFlow=format_ratio(pe_free_cash_flow,2),
-        fouryearPEFreeCashFlow=format_ratio(fouryearcashflowaverage)
-
+        enterpriseValue=format_number_human(ev),
+        fcf_to_net_income=format_percentage(fcf_to_net_income),
+        netDebt=format_number_human(net_debt),
+        revenue_cagr=format_percentage(revenue_cagr),
+        net_income_cagr=format_percentage(net_income_cagr),
+        fcf_cagr=format_percentage(fcf_cagr),
     )
 
 
