@@ -6,6 +6,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
 from formats.numberFormats import format_number_human, format_percentage, format_ratio, safe_cagr
+from formats.retrievesInformation import safe_row
 from models.company_info import Company
 from models.company_news import CompanyNews
 from models.news import News
@@ -23,33 +24,46 @@ pd.set_option("display.width", None)
 pd.options.display.float_format = "{:,.0f}".format
 
 # Financial AI Summary
-@app.get("/stocks/profile/financials")
+@app.get("/stocks/profile/financials/{symbol}")
 async def get_financials_for_summary(symbol: str):
     dat = yf.Ticker(symbol)
+
     income_stat = dat.income_stmt
     cashflow_stat = dat.cash_flow
     balance_sheet = dat.balance_sheet
 
-    revenue = income_stat.loc["Total Revenue"].iloc[0:2]
-    gross_profit = income_stat.loc["Gross Profit"].iloc[0:2]
-    operating_income = income_stat.loc["Operating Income"].iloc[0:2]
-    net_icome = income_stat.loc["Net Income"].iloc[0:2]
-    basic_eps = income_stat.loc["Basic EPS"].iloc[0:2]
+    return {
+        "symbol": symbol,
 
-    total_assets = balance_sheet.loc["Total Assets"].iloc[0:2]
-    total_liabilities = balance_sheet.loc["Total Liabilities Net Minority Interest"].iloc[0:2]
-    total_equity = balance_sheet.loc["Total Equity Gross Minority Interest"].iloc[0:2]
-    cash_and_cash_equavalent = balance_sheet.loc["Cash And Cash Equivalents"].iloc[0:2]
-    current_assets = balance_sheet.loc["Current Assets"].iloc[0:2]
-    current_liabilities = balance_sheet.loc["Current Liabilities"].iloc[0:2]
-    working_capital = balance_sheet.loc["Working Capital"].iloc[0:2]
-    total_debt = balance_sheet.loc["Total Debt"].iloc[0:2]
+        "income_statement": {
+            "revenue": safe_row(income_stat, "Total Revenue"),
+            "gross_profit": safe_row(income_stat, "Gross Profit"),
+            "operating_income": safe_row(income_stat, "Operating Income"),
+            "net_income": safe_row(income_stat, "Net Income"),
+            "basic_eps": safe_row(income_stat, "Basic EPS"),
+        },
 
-    net_income_from_continuing_operations = cashflow_stat.loc["Net Income From Continuing Operations"].iloc[0:2]
-    investing_cash_flow = cashflow_stat.loc["Investing Cash Flow"].iloc[0:2]
-    financing_cash_flow = cashflow_stat.loc["Financing Cash Flow"].iloc[0:2]
-    free_cash_flow = cashflow_stat.loc["Free Cash Flow"].iloc[0:2]
-    changes_in_cash = cashflow_stat.loc["Changes In Cash "].iloc[0:2]
+        "balance_sheet": {
+            "total_assets": safe_row(balance_sheet, "Total Assets"),
+            "total_liabilities": safe_row(balance_sheet, "Total Liabilities Net Minority Interest"),
+            "total_equity": safe_row(balance_sheet, "Total Equity Gross Minority Interest"),
+            "cash_and_cash_equivalents": safe_row(balance_sheet, "Cash And Cash Equivalents"),
+            "current_assets": safe_row(balance_sheet, "Current Assets"),
+            "current_liabilities": safe_row(balance_sheet, "Current Liabilities"),
+            "working_capital": safe_row(balance_sheet, "Working Capital"),
+            "total_debt": safe_row(balance_sheet, "Total Debt"),
+        },
+
+        "cash_flow": {
+            "net_income_from_continuing_operations": safe_row(
+                cashflow_stat, "Net Income From Continuing Operations"
+            ),
+            "investing_cash_flow": safe_row(cashflow_stat, "Investing Cash Flow"),
+            "financing_cash_flow": safe_row(cashflow_stat, "Financing Cash Flow"),
+            "free_cash_flow": safe_row(cashflow_stat, "Free Cash Flow"),
+            "changes_in_cash": safe_row(cashflow_stat, "Changes In Cash"),
+        }
+    }
 
 
 # Personal Metrics
