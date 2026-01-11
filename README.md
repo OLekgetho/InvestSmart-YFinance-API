@@ -3,6 +3,7 @@
 [![Python](https://img.shields.io/badge/Python-3.9%2B-blue)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.100%2B-009688)](https://fastapi.tiangolo.com/)
 [![yfinance](https://img.shields.io/badge/yfinance-Latest-green)](https://pypi.org/project/yfinance/)
+![Code](https://custom-icon-badges.demolab.com/github/languages/code-size/OLEKGETHO/InvestSmart-YFinance-API?logo=file-code&logoColor=white)
 
 ## Overview
 
