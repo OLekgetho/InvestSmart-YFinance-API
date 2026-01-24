@@ -5,6 +5,13 @@
 [![yfinance](https://img.shields.io/badge/yfinance-Latest-green)](https://pypi.org/project/yfinance/)
 ![Code](https://custom-icon-badges.demolab.com/github/languages/code-size/OLEKGETHO/InvestSmart-YFinance-API?logo=file-code&logoColor=white)
 
+## 🎥 App Demo
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/OLekgetho/InvestSmart-YFinance-API/Prod/InvestSmart%20Demo.gif" width="250" style="margin: 0 10px; border-radius: 15px;" />
+  <img src="https://raw.githubusercontent.com/OLekgetho/InvestSmart-YFinance-API/Prod/InvestSmart%20Demo%20part%202.gif" width="250" style="margin: 0 10px; border-radius: 15px;" />
+</p>
+
 ## Overview
 
 The InvestSmart YFinance API is a dedicated Python-based microservice responsible for retrieving, processing, and exposing financial market data using the yfinance library.
